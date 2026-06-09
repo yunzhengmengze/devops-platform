@@ -102,6 +102,53 @@ curl http://localhost:8000/health
 | PUT | `/tasks/{id}` | 更新任务 |
 | DELETE | `/tasks/{id}` | 删除任务 |
 
+## 运行演示
+
+```bash
+bash scripts/demo.sh
+```
+
+输出效果：
+
+```
+╔══════════════════════════════════════════════╗
+║     DevOps Platform — 项目演示               ║
+╚══════════════════════════════════════════════╝
+
+[1/5] 架构概览
+  请求 → Nginx(:8000) → 负载均衡 → App1 + App2
+  ┌─────────┐      ┌───────────┐
+  │  Nginx  │─────▶│  App 1    │
+  │  :8000  │      └───────────┘
+  │         │      ┌───────────┐
+  │         │─────▶│  App 2    │
+  └─────────┘      └───────────┘
+
+[2/5] Docker 容器状态
+NAME                      STATUS             PORTS
+devops-platform-app1-1    Up (healthy)       8000/tcp
+devops-platform-app2-1    Up (healthy)       8000/tcp
+devops-platform-nginx-1   Up                 0.0.0.0:8000->80/tcp
+
+[3/5] 健康检查
+{"status":"ok","version":"1.0.0"}
+
+[4/5] API 功能测试
+  GET  /health → {"status":"ok","version":"1.0.0"}
+  POST /tasks  → {"id":"47b4cc9f","title":"Demo 测试任务",...}
+  GET  /tasks  → [{"id":"344d3001","title":"学习Kubernetes",...}]
+
+[5/5] 自动化测试
+tests/test_main.py::test_root PASSED
+tests/test_main.py::test_health PASSED
+tests/test_main.py::test_ready PASSED
+tests/test_main.py::test_create_and_get_task PASSED
+tests/test_main.py::test_update_task PASSED
+tests/test_main.py::test_delete_task PASSED
+tests/test_main.py::test_404 PASSED
+============================== 7 passed ==============================
+```
+
 ## 项目结构
 
 ```

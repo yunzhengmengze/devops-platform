@@ -1,17 +1,45 @@
-version: "3.9"
-
 services:
-  app:
+  # ========== API 实例 1 ==========
+  app1:
     build:
       context: .
       dockerfile: Dockerfile
-    ports:
-      - "8000:8000"
     environment:
-      - APP_VERSION=dev
+      - APP_VERSION=1.0.0
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 15s
+      timeout: 3s
+      retries: 3
+
+  # ========== API 实例 2 ==========
+  app2:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - APP_VERSION=1.0.0
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 15s
+      timeout: 3s
+      retries: 3
+
+  # ========== Nginx 反向代理 ==========
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "8000:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - app1
+      - app2
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost/nginx-health"]
       interval: 15s
       timeout: 3s
       retries: 3
