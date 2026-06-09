@@ -1,0 +1,22 @@
+# 默认配置 — 生产环境请覆盖
+replicaCount: 2
+
+image:
+  repository: devops-platform
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 256Mi
+
+app:
+  version: "1.0.0"
